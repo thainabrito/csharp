@@ -1,40 +1,42 @@
 using Xunit;
 using System.IO;
 using System;
-using election_day;
+using Moq;
+using guessing_number;
 using FluentAssertions;
 
-namespace election_day.Test;
+namespace guessing_number.Test;
 
 [Collection("Sequential")]
 public class TestThirdReq
 {
-    [Theory(DisplayName = "Deve imprimir o resultado")]
-    [InlineData(new string[]{"6","1","1","5","A","3","2"}, 2, 1, 1, 2)]
-    public void TestPrintResult(
-        string[] entrys,
-        int expectedReceivedOption1,
-        int expectedReceivedOption2,
-        int expectedReceivedOption3,
-        int expectedOptionNull)
+    [Theory(DisplayName = "Deve receber a executar o fluxo completo do programa")]
+    [InlineData(new object[] {new string[]{"10"}, 10})]
+    public void TestFullFlow(string[] entrys, int mockValue)
     {
-        var ballotBox = new BallotBox();
-        using(var stringWriter = new StringWriter()) 
-        {   
+    var classGuessNumber = new GuessNumber();
 
-            using(var StringReader = new StringReader(string.Join("\n", entrys))) 
-            {
-            Console.SetOut(stringWriter);
-            Console.SetIn(StringReader);
-            Program.Main();
-            var response = stringWriter.ToString().Trim().Split("\n");
-            response.Should().Contain("A opção 1 recebeu: " + expectedReceivedOption1 + " voto(s)");
-            response.Should().Contain("A opção 2 recebeu: " + expectedReceivedOption2 + " voto(s)");
-            response.Should().Contain("A opção 3 recebeu: " + expectedReceivedOption3 + " voto(s)");
-            response.Should().Contain("Total de votos anulados: " + expectedOptionNull + " voto(s)");       
+    var stringWriter = new StringWriter();
 
-            }
+    var stringReader = new StringReader(string.Join("\n", entrys));
 
-        }
+    Console.SetOut(stringWriter);
+    Console.SetIn(stringReader);
+
+    classGuessNumber.randomValue = mockValue;
+
+    do
+    {
+      classGuessNumber.ChooseNumber();
+      classGuessNumber.AnalyzePlay();
+    } while (classGuessNumber.randomValue != classGuessNumber.userValue);
+
+    classGuessNumber.randomValue.Should().Be(mockValue);
+
+    classGuessNumber.userValue.Should().Be(mockValue);
+
+    string result = stringWriter.ToString().Trim();
+
+    result.Should().Contain("ACERTOU!");
     }
 }

@@ -1,20 +1,16 @@
-﻿namespace election_day
-{
-    public class Program
-    {
-        public static void Main()
-        {
-            var ballotBox  = new BallotBox();          
+﻿namespace guessing_number;
 
-            int countVoters = ballotBox.GetCountVoters(); 
-            if(countVoters > 0)
-            {
-                Console.WriteLine("Número de eleitores informado " + countVoters);
-               
-                ballotBox.Start(countVoters);
-        
-                ballotBox.PrintResult();                   
-            }
-        }
-    }
+public class Program
+{    
+    public static void Main()
+    {
+        GuessNumber Game = new();
+        Game.Greet();        
+        Game.RandomNumber();
+        do
+        {
+            Game.ChooseNumber();
+            Game.AnalyzePlay();
+        }while(Game.randomValue != Game.userValue);         
+    }   
 }
